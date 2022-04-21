@@ -77,11 +77,10 @@ wss.on("connection", (ws) => {
 });
 
 
-// Display welcome messages
-console.log("Welcome to the unofficial Enmity debugger.");
-console.log("Press Ctrl+C at any time to exit.");
+// Display welcome message and basic instructions
+console.log(`Welcome to the unofficial Enmity debugger.
+Press Ctrl+C at any time to exit.
 
-console.log(`
 Connect to this debugger from Discord on your iOS device
 by typing the following slash command in the chat box:
 
