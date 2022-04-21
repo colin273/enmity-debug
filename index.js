@@ -6,6 +6,7 @@ const { red, bold: { blue } } = require("ansi-colors");
 // Keep track of whether we need to log an additional empty line
 let isPrompting = false;
 
+
 // Utility functions for more visually pleasing logs
 const colorLog = (data, source, color) => {
   if (isPrompting) {
@@ -37,7 +38,7 @@ rl.on("line", (input) => {
   try {
     isPrompting = false;
     globalWs.send(input);
-  } catch(e) {
+  } catch (e) {
     debuggerError(e);
     prompt();
   }
@@ -55,7 +56,7 @@ const wss = new WebSocketServer({ port: 9090 });
 
 // Add server connection handler and websocket event handlers
 wss.on("connection", (ws) => {
-  debuggerLog("Connected to Enmity over websocket, starting debug session");
+  debuggerLog("Connected to Discord over websocket, starting debug session");
 
   ws.on("message", (data) => {
     try {
@@ -81,8 +82,8 @@ console.log("Welcome to the Enmity debugger.");
 console.log("Press Ctrl+C at any time to exit.");
 
 console.log(`
-Connect to this debugger from Enmity on your iOS device by typing the 
-following slash command in the chat box:
+Connect to this debugger from Discord on your iOS device
+by typing the following slash command in the chat box:
 
   /websocket host:${hostname()}:9090
 `);
