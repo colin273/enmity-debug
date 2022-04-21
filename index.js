@@ -78,7 +78,7 @@ wss.on("connection", (ws) => {
 
 
 // Display welcome messages
-console.log("Welcome to the Enmity debugger.");
+console.log("Welcome to the unofficial Enmity debugger.");
 console.log("Press Ctrl+C at any time to exit.");
 
 console.log(`
