@@ -1,0 +1,12 @@
+{
+   "name": "enmity-debug",
+   "version": "1.0.0",
+   "description": "Provides a console for debugging Enmity over a websocket.",
+   "main": "index.js",
+   "author": "FifiTheBulldog",
+   "license": "MIT",
+   "dependencies": {
+      "ansi-colors": "^4.1.1",
+      "ws": "^8.5.0"
+   }
+}
