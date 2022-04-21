@@ -9,10 +9,9 @@ let isPrompting = false;
 
 // Utility functions for more visually pleasing logs
 const colorLog = (data, source, color) => {
-  if (isPrompting) {
-    console.log(); // get out of user input area
-  }
-  console.log(color(`[${source}] `) + data);
+  // Get out of user input area if prompt is currently being shown
+  // Then log
+  console.log((isPrompting ? "\n" : "") + color(`[${source}] `) + data);
 }
 
 const debuggerLog = (data) => colorLog(data, "Debugger", blue);
