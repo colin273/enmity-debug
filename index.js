@@ -62,9 +62,13 @@ wss.on("connection", (ws) => {
   const rl = repl.start({
     eval: (input, ctx, filename, cb) => {
       try {
-        isPrompting = false;
-        ws.send(input);
-        finishCallback = cb;
+        if (!input.trim()) {
+          cb();
+        } else {
+          isPrompting = false;
+          ws.send(input);
+          finishCallback = cb;
+        }
       } catch (e) {
         cb(e);
       }
