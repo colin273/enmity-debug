@@ -36,4 +36,4 @@ Once the debugger is connected to the iOS Discord app, you can begin debugging. 
 
 ## Quitting
 
-Once you have finished debugging, you can simply press `Ctrl+C` on your keyboard to quit the debugger. The websocket will be disconnected automatically.
+Once you have finished debugging and closed the debugger REPL, press `Ctrl+C` on your keyboard to quit the CLI.

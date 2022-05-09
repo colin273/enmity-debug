@@ -81,8 +81,7 @@ wss.on("connection", (ws) => {
   isPrompting = true; // Now the REPL exists and is prompting the user for input
   
   rl.on("close", () => {
-    debuggerLog("Closing debugger");
-    process.exit();
+    debuggerLog("Closing debugger, press Ctrl+C to exit");
   });
 
   ws.on("close", () => {
