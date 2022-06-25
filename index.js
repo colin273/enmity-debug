@@ -2,7 +2,7 @@ import { hostname } from "os";
 import repl from "repl";
 import { WebSocketServer } from "ws";
 import colors from "ansi-colors";
-const { red, yellow, bold: { blue } } = colors;
+const { cyan, red, yellow, bold: { blue } } = colors;
 
 let isPrompting = false;
 
@@ -13,12 +13,16 @@ const safeLog = (data) => console.log((isPrompting ? "\n" : "") + data);
 
 const discordColorize = (data) => {
   let { message, level } = JSON.parse(data);
+  // Normal logs don't need extra colorization
   switch (level) {
-    case 3:
-      message = red(message);
+    case 0: // Info
+      message = cyan(message);
       break;
-    case 2:
+    case 2: // Warning
       message = yellow(message);
+      break;
+    case 3: // Error
+      message = red(message);
       break;
   }
   return colorize(message, "Discord", blue);
