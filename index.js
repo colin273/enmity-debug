@@ -2,7 +2,7 @@ import { hostname } from "os";
 import repl from "repl";
 import { WebSocketServer } from "ws";
 import colors from "ansi-colors";
-const { red, bold: { blue } } = colors;
+const { red, yellow, bold: { blue } } = colors;
 
 let isPrompting = false;
 
@@ -11,7 +11,18 @@ let isPrompting = false;
 const colorize = (data, source, color) => color(`[${source}] `) + data;
 const safeLog = (data) => console.log((isPrompting ? "\n" : "") + data);
 
-const discordColorize = (data) => colorize(JSON.parse(data).message, "Discord", blue);
+const discordColorize = (data) => {
+  let { message, level } = JSON.parse(data);
+  switch (level) {
+    case 3:
+      message = red(message);
+      break;
+    case 2:
+      message = yellow(message);
+      break;
+  }
+  return colorize(message, "Discord", blue);
+};
 const discordLog = (data) => safeLog(discordColorize(data));
 
 const debuggerColorize = (data) => colorize(data, "Debugger", blue);
