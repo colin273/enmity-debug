@@ -1,8 +1,12 @@
 # Enmity Debugger
 
-A (relatively) simple remote debugger for [Enmity](https://enmity.app). This connects to the iOS Discord app with Enmity installed over a websocket and allows you to execute JavaScript in the Discord app from the command line. 
+A (relatively) simple remote debugger for [Enmity](https://enmity.app). This connects over a websocket to the iOS Discord app with Enmity installed and allows you to execute JavaScript in the Discord app from the command line. The REPL in this debugger is a slightly modified version of the [default REPL in Node.js](https://nodejs.org/api/repl.html), including the same commands and some support for multi-line code snippets.
 
-There is an official (unreleased for now) Enmity debugger app in development, featuring a GUI with logs and a code editor for better ease of use. There is also an old version of the debugger built on [Flutter](https:flutter.dev) (builds are available to download [here](https://github.com/beerpiss/enmitydebugger)). However, I was unable to establish a websocket connection between my Mac and any of my iOS devices using the Flutter app, so I made my own debugger CLI using [Node.js](https://nodejs.org) and tried to mimic what little I know about the intended behavior of the official debugger as closely as possible.
+This began life as an interim debugger tool for me while I waited for the release of a new official Enmity debugger, but it has since become my preferred method of debugging Enmity plugins. (I'm biased though.) If this particular debugger doesn't meet your needs, there are similar tools by other developers:
+
+- [enmity-devsocket](https://github.com/Beefers/enmity-devsocket) - a full GUI debugger, featuring a server and a browser client. The client includes a code editor that allows for easy writing and running of many lines of code at once. Enmity's console output is displayed next to the editor.
+- [debug-ws-server](https://github.com/Aliucord/debug-ws-server) - made for [Aliucord](https://github.com/Aliucord), but compatible with Enmity. This CLI debugger is written in Go and doesn't have any builds published on GitHub, so you'll have to compile it yourself.
+- [Legacy Enmity debugger](https://github.com/beerpiss/enmitydebugger) - the old official Enmity debugger. It's a GUI app built on [Flutter](https://flutter.dev), which makes it significantly heavier than the other debuggers I've tried. My CLI's behavior is loosely based on the behavior of this one. The linked repo is not where this debugger was developed, but it uses GitHub Actions to generate ready-to-use builds.
 
 ## Installing
 
