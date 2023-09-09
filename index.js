@@ -4,6 +4,10 @@ import { WebSocketServer } from "ws";
 import colors from "ansi-colors";
 const { cyan, red, yellow, bold: { blue } } = colors;
 
+// Whether the prompt is currently open to the user,
+// and thus whether any messages from the websocket
+// need to be printed with a preceding newline
+// to get out of the prompt line.
 let isPrompting = false;
 
 // Utility functions for more visually pleasing logs
@@ -55,12 +59,13 @@ wss.on("connection", (ws) => {
   debuggerLog("Connected to Discord over websocket, starting debug session");
 
   isPrompting = false; // REPL hasn't been created yet
-  let finishCallback;
+  let finishCallback;  // Callback from REPL's eval() to write to stdout
 
   // Handle logs returned from Discord client via the websocket
   ws.on("message", (data) => {
     try {
       if (finishCallback) {
+        // write data to stdout and display repl's prompt again
         finishCallback(null, data);
         finishCallback = undefined;
       } else {
@@ -78,14 +83,15 @@ wss.on("connection", (ws) => {
     eval: (input, ctx, filename, cb) => {
       try {
         if (!input.trim()) {
-          cb();
+          cb();  // no output to write, just show the prompt again
         } else {
-          isPrompting = false;
+          isPrompting = false;  // don't need to get out of prompt area on print
           ws.send(input);
+          // Websocket's message handler will call this to show the prompt again
           finishCallback = cb;
         }
       } catch (e) {
-        cb(e);
+        cb(e);  // display error immediately
       }
     },
     writer: (data) => {
