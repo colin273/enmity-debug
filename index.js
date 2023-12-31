@@ -1,14 +1,22 @@
 import { hostname } from "os";
 import repl from "repl";
 import { WebSocketServer } from "ws";
+import { mkdirSync, writeFile } from "fs";
+import { join } from "path";
 import colors from "ansi-colors";
 const { cyan, red, yellow, bold: { blue } } = colors;
+
+const DONE_SIGNAL = "done";
+const DUMP_SEPARATOR = ":";
+const DUMPED_PATH = "./dumped";
 
 // Whether the prompt is currently open to the user,
 // and thus whether any messages from the websocket
 // need to be printed with a preceding newline
 // to get out of the prompt line.
 let isPrompting = false;
+
+let isDumping = false;
 
 // Utility functions for more visually pleasing logs
 // Get out of user input area first if prompt is currently being shown
@@ -41,6 +49,53 @@ const debuggerError = (err, isReturning) => {
     return err;
   }
   console.error(err);
+};
+
+
+const dumpModules = (ws) => {
+  debuggerLog("Dumping modules...");
+  isDumping = true;  // don't log modules as they're returned
+
+  // Create folder
+  try {
+    mkdirSync(DUMPED_PATH);
+  } catch {
+    // Dumped folder already exists.
+  }
+
+  // Start dumping modules
+  ws.send(`
+    const { inspect } = enmity.modules.getByProps("inspect");
+    for (const id in modules) {
+      console.log(id + "${DUMP_SEPARATOR}" + inspect(modules[id].publicModule?.exports, {
+        showHidden: true,
+        getters: true,
+        maxArrayLength: null,
+        maxStringLength: null
+      }));
+    }
+    console.log("${DONE_SIGNAL}");
+  `);
+  // Dumped modules (as console logs) will be received and handled in receiveDumpedModule()
+};
+
+const receiveDumpedModule = (data) => {
+  const { message } = JSON.parse(data);
+  if (message.trim() === DONE_SIGNAL) {
+    // Stop receiving dumped modules, return to normal REPL mode
+    isDumping = false;
+    debuggerLog("Finished dumping modules.");
+  } else {
+    // Save dumped module to <ID>.txt in folder for dumped modules
+    const splitIdx = message.indexOf(DUMP_SEPARATOR);
+    const id = message.slice(0, splitIdx);
+    const moduleStr = message.slice(splitIdx + 1);
+    try {
+      writeFile(join(DUMPED_PATH, `${id}.txt`), moduleStr, ()=>{});
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
 
 
@@ -59,23 +114,28 @@ wss.on("connection", (ws) => {
   debuggerLog("Connected to Discord over websocket, starting debug session");
 
   isPrompting = false; // REPL hasn't been created yet
+  isDumping = false;
   let finishCallback;  // Callback from REPL's eval() to write to stdout
 
   // Handle logs returned from Discord client via the websocket
   ws.on("message", (data) => {
-    try {
-      if (finishCallback) {
-        // write data to stdout and display repl's prompt again
-        finishCallback(null, data);
-        finishCallback = undefined;
-      } else {
-        discordLog(data);
+    if (isDumping) {
+      receiveDumpedModule(data);
+    } else {
+      try {
+        if (finishCallback) {
+          // write data to stdout and display repl's prompt again
+          finishCallback(null, data);
+          finishCallback = undefined;
+        } else {
+          discordLog(data);
+        }
+      } catch (e) {
+        debuggerError(e, false);
       }
-    } catch (e) {
-      debuggerError(e, false);
+      isPrompting = true;
+      rl.displayPrompt();
     }
-    isPrompting = true;
-    rl.displayPrompt();
   });
 
   // Create the REPL
@@ -103,6 +163,13 @@ wss.on("connection", (ws) => {
   
   rl.on("close", () => {
     debuggerLog("Closing debugger, press Ctrl+C to exit");
+  });
+
+  rl.defineCommand("dump", {
+    help: "Dump modules from Discord to your computer",
+    action: () => {
+      dumpModules(ws);
+    }
   });
 
   ws.on("close", () => {
