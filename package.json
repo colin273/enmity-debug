@@ -1,6 +1,6 @@
 {
    "name": "enmity-debug",
-   "version": "2.1.0",
+   "version": "2.2.0",
    "description": "Provides a console for debugging Enmity over a websocket.",
    "type": "module",
    "author": "colin273",
